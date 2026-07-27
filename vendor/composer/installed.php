@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'support-portal/app',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '63074fe5518a2d8f6b1f3cc84a32351d690f8812',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -92,9 +92,9 @@
             'dev_requirement' => false,
         ),
         'support-portal/app' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '63074fe5518a2d8f6b1f3cc84a32351d690f8812',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

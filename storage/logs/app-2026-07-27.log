@@ -1,0 +1,17 @@
+[2026-07-27 21:36:24] [ERROR] DB connection failed: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+[2026-07-27 21:36:24] [ERROR] RuntimeException: Database connection failed. Check your .env configuration. in D:\xampp\htdocs\support-portal\app\Core\Database.php:23
+[2026-07-27 21:38:47] [ERROR] DB connection failed: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+[2026-07-27 21:38:47] [ERROR] RuntimeException: Database connection failed: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it. Check your .env configuration. in D:\xampp\htdocs\support-portal\app\Core\Database.php:23
+[2026-07-27 21:44:13] [ERROR] DB connection failed: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+[2026-07-27 21:44:13] [ERROR] RuntimeException: Database connection failed: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it. Check your .env configuration. in D:\xampp\htdocs\support-portal\app\Core\Database.php:23
+[2026-07-27 21:44:50] [ERROR] DB connection failed: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it
+[2026-07-27 21:44:50] [ERROR] RuntimeException: Database connection failed: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it. Check your .env configuration. in D:\xampp\htdocs\support-portal\app\Core\Database.php:23
+[2026-07-27 21:47:05] [WARNING] Login failed (wrong password): admin@support-portal.com
+[2026-07-27 21:47:27] [WARNING] Login failed (wrong password): admin@support-portal.com
+[2026-07-27 21:47:48] [WARNING] Login failed (user not found): john.smith@support.com
+[2026-07-27 21:50:28] [WARNING] Login failed (wrong password): admin@support-portal.com
+[2026-07-27 21:52:26] [WARNING] Login failed (wrong password): admin@support-portal.com
+[2026-07-27 21:53:00] [INFO] Login success: john.smith@support.com (role: employee)
+[2026-07-27 21:53:15] [ERROR] ParseError: syntax error, unexpected token "{", expecting "function" or "const" in D:\xampp\htdocs\support-portal\app\Controllers\Ticket\TicketController.php:6
+[2026-07-27 21:53:20] [ERROR] Error: Class "role:super_admin" not found in D:\xampp\htdocs\support-portal\app\Core\Router.php:81
+[2026-07-27 21:53:35] [ERROR] ParseError: syntax error, unexpected token "{", expecting "function" or "const" in D:\xampp\htdocs\support-portal\app\Controllers\Ticket\TicketController.php:6

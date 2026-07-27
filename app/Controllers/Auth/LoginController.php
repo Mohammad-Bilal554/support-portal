@@ -1,13 +1,52 @@
 <?php
 declare(strict_types=1);
 namespace App\Controllers\Auth;
+
 use App\Core\Controller;
+use App\Core\Csrf;
 use App\Core\Request;
+use App\Core\Validator;
+use App\Services\AuthService;
+
 class LoginController extends Controller
 {
-    public function __call(string $name, array $args): string
+    public function showLogin(Request $request): string
     {
-        return '<h2 style="font-family:monospace;padding:2rem;color:#3b82f6;">'
-             . '🚧 LoginController::${name}() — Module 2 (Auth) not yet built.</h2>';
+        if ($this->session->isLoggedIn()) {
+            $this->redirect(url('dashboard'));
+        }
+        return $this->view('auth.login', [
+            'title'     => 'Sign In',
+            'csrfToken' => Csrf::getToken(),
+        ]);
+    }
+
+    public function login(Request $request): string
+    {
+        $validator = new Validator($request->all(), [
+            'email'    => 'required|email|max_length:150',
+            'password' => 'required|min_length:1',
+        ]);
+
+        if ($validator->fails()) {
+            $this->session->setFlash('errors', $validator->errors());
+            $this->session->setFlash('old', $request->only(['email']));
+            $this->redirect(url('auth/login'));
+        }
+
+        $result = (new AuthService())->attempt(
+            (string) $request->input('email'),
+            (string) $request->input('password'),
+            $request->ip()
+        );
+
+        if (! $result['success']) {
+            $this->session->setFlash('error', $result['message']);
+            $this->session->setFlash('old', $request->only(['email']));
+            $this->redirect(url('auth/login'));
+        }
+
+        $intended = $this->session->getFlash('intended_url');
+        $this->redirect($intended ?: url('dashboard'));
     }
 }

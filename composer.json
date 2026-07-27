@@ -14,13 +14,7 @@
             "App\\": "app/",
             "Config\\": "config/"
         },
-        "files": [
-            "app/Core/Helpers.php"
-        ]
+        "files": ["app/Core/Helpers.php"]
     },
-    "config": {
-        "optimize-autoloader": true,
-        "sort-packages": true
-    },
-    "minimum-stability": "stable"
+    "config": { "optimize-autoloader": true }
 }

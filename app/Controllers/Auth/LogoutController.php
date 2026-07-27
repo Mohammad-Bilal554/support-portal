@@ -1,13 +1,17 @@
 <?php
 declare(strict_types=1);
 namespace App\Controllers\Auth;
+
 use App\Core\Controller;
 use App\Core\Request;
+use App\Services\AuthService;
+
 class LogoutController extends Controller
 {
-    public function __call(string $name, array $args): string
+    public function logout(Request $request): never
     {
-        return '<h2 style="font-family:monospace;padding:2rem;color:#3b82f6;">'
-             . '🚧 LogoutController::${name}() — Module 2 (Auth) not yet built.</h2>';
+        (new AuthService())->logout($request->ip());
+        $this->session->success('You have been logged out successfully.');
+        $this->redirect(url('auth/login'));
     }
 }
