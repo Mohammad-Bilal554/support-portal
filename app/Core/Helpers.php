@@ -191,3 +191,77 @@ if (!function_exists('render_pagination')) {
         return $html . '</ul></nav>';
     }
 }
+
+// ── UI helpers added in Module 3 ────────────────────────────────
+
+if (!function_exists('format_datetime')) {
+    function format_datetime(string $datetime, string $format = 'd M Y, H:i'): string {
+        return $datetime ? date($format, strtotime($datetime)) : '';
+    }
+}
+
+if (!function_exists('partial')) {
+    function partial(string $name, array $data = []): string {
+        $path = base_path('resources/views/partials/' . $name . '.php');
+        if (!file_exists($path)) return '';
+        extract($data, EXTR_SKIP);
+        ob_start();
+        include $path;
+        return ob_get_clean();
+    }
+}
+
+if (!function_exists('ticket_status_badge')) {
+    // Override with improved version
+}
+
+if (!function_exists('status_badge')) {
+    function status_badge(string $status): string {
+        $map = [
+            'open'               => 'badge-status-open',
+            'assigned'           => 'badge-status-assigned',
+            'in_progress'        => 'badge-status-in_progress',
+            'waiting_for_client' => 'badge-status-waiting_for_client',
+            'resolved'           => 'badge-status-resolved',
+            'closed'             => 'badge-status-closed',
+        ];
+        $class = $map[$status] ?? 'bg-secondary text-white';
+        $label = ucwords(str_replace('_', ' ', $status));
+        return "<span class=\"badge {$class}\">{$label}</span>";
+    }
+}
+
+if (!function_exists('priority_badge')) {
+    function priority_badge(string $priority): string {
+        $map = [
+            'low'      => 'badge-priority-low',
+            'medium'   => 'badge-priority-medium',
+            'high'     => 'badge-priority-high',
+            'critical' => 'badge-priority-critical',
+        ];
+        $class = $map[$priority] ?? 'bg-secondary text-white';
+        $icons = ['low'=>'↓','medium'=>'→','high'=>'↑','critical'=>'‼'];
+        $icon  = $icons[$priority] ?? '';
+        return "<span class=\"badge {$class}\">{$icon} ".ucfirst($priority)."</span>";
+    }
+}
+
+if (!function_exists('role_badge')) {
+    function role_badge(string $role): string {
+        $map = [
+            'super_admin' => ['bg'=>'#ede9fe','color'=>'#6d28d9','label'=>'Super Admin'],
+            'employee'    => ['bg'=>'#dbeafe','color'=>'#1d4ed8','label'=>'Employee'],
+            'client'      => ['bg'=>'#d1fae5','color'=>'#065f46','label'=>'Client'],
+        ];
+        $s = $map[$role] ?? ['bg'=>'#f1f5f9','color'=>'#475569','label'=>ucfirst($role)];
+        return "<span class=\"badge\" style=\"background:{$s['bg']};color:{$s['color']};font-size:.7rem;\">{$s['label']}</span>";
+    }
+}
+
+if (!function_exists('initials_avatar')) {
+    function initials_avatar(string $name, string $color = '#0d6efd', int $size = 36): string {
+        $initials = implode('', array_map(fn($w) => strtoupper($w[0]), array_slice(explode(' ', $name), 0, 2)));
+        $url = "https://ui-avatars.com/api/?name=".urlencode($name)."&background=".ltrim($color,'#')."&color=fff&size=".($size*2);
+        return "<img src=\"{$url}\" width=\"{$size}\" height=\"{$size}\" style=\"border-radius:50%;object-fit:cover;\" alt=\"{$initials}\">";
+    }
+}

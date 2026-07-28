@@ -28,4 +28,6 @@ ob_start();
 </div>
 <?php
 $content = ob_get_clean();
+ob_start();
 require base_path('resources/views/layouts/auth.php');
+echo ob_get_clean();
