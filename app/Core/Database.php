@@ -20,7 +20,7 @@ class Database {
             ]);
         } catch (\PDOException $e) {
             Logger::getInstance()->error('DB connection failed: '.$e->getMessage());
-            throw new \RuntimeException('Database connection failed. Check your .env configuration.');
+            throw new \RuntimeException('Database connection failed: ' . $e->getMessage() . '. Check your .env configuration.', 0, $e);
         }
     }
     public static function getInstance(): static {
