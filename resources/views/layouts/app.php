@@ -50,24 +50,16 @@ $navItems = [
 ];
 
 // Current path for active detection
-$currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+$currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
-if (!function_exists('navIsActive')) {
-    function navIsActive(string $url): bool {
-        global $currentPath;
-        $curr = is_string($currentPath) ? $currentPath : '/';
-        $navPath = parse_url($url, PHP_URL_PATH);
-        if (!is_string($navPath) || $navPath === '') {
-            return false;
-        }
-        return str_starts_with($curr, $navPath) && $navPath !== '/';
-    }
+function navIsActive(string $url): bool {
+    global $currentPath, $appUrl;
+    $navPath = parse_url($url, PHP_URL_PATH);
+    return $navPath && str_starts_with($currentPath, $navPath) && $navPath !== '/';
 }
 
-if (!function_exists('canSee')) {
-    function canSee(array $item, string $role): bool {
-        return isset($item['roles']) && is_array($item['roles']) && in_array($role, $item['roles'], true);
-    }
+function canSee(array $item, string $role): bool {
+    return in_array($role, $item['roles']);
 }
 ?>
 <!DOCTYPE html>

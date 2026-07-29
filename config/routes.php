@@ -48,6 +48,7 @@ $router->group(['middleware'=>['auth','csrf']], function(Router $r) {
         $r->get('users/{id}',       [\App\Controllers\Admin\UserController::class,'edit'])     ->name('admin.users.edit');
         $r->post('users/{id}',      [\App\Controllers\Admin\UserController::class,'update'])   ->name('admin.users.update');
         $r->delete('users/{id}',    [\App\Controllers\Admin\UserController::class,'destroy'])  ->name('admin.users.destroy');
+        $r->post('users/{id}/toggle', [\App\Controllers\Admin\UserController::class,'toggleStatus'])->name('admin.users.toggle');
         $r->get('companies',        [\App\Controllers\Admin\CompanyController::class,'index']) ->name('admin.companies.index');
         $r->get('companies/create', [\App\Controllers\Admin\CompanyController::class,'create'])->name('admin.companies.create');
         $r->post('companies',       [\App\Controllers\Admin\CompanyController::class,'store']) ->name('admin.companies.store');
@@ -83,3 +84,6 @@ $router->group(['prefix'=>'api','middleware'=>'api.auth'], function(Router $r) {
     $r->put('tickets/{id}',     [\App\Controllers\Api\TicketApiController::class,'update']) ->name('api.tickets.update');
     $r->delete('tickets/{id}',  [\App\Controllers\Api\TicketApiController::class,'destroy'])->name('api.tickets.destroy');
 });
+
+// User toggle status (added in Module 4)
+// This is registered inside the admin group via the controller

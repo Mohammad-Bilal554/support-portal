@@ -38,7 +38,7 @@ echo "  → 2 companies seeded.\n";
 
 // Users
 echo "Seeding users...\n";
-$hAdmin = password_hash('Admin@123',    PASSWORD_BCRYPT, ['cost'=>12]);
+$hAdmin = password_hash('Admin@12345',  PASSWORD_BCRYPT, ['cost'=>12]);
 $hEmp   = password_hash('Employee@123', PASSWORD_BCRYPT, ['cost'=>12]);
 $hCli   = password_hash('Client@123',   PASSWORD_BCRYPT, ['cost'=>12]);
 $users  = [
@@ -55,7 +55,7 @@ echo "  → ".count($users)." users seeded.\n";
 
 echo "\n✅ Seeding complete!\n";
 echo "─────────────────────────────────────────────────────\n";
-echo "  Super Admin  : admin@support-portal.com  / Admin@123\n";
+echo "  Super Admin  : admin@support-portal.com  / Admin@12345\n";
 echo "  Employee 1   : john.smith@support.com    / Employee@123\n";
 echo "  Employee 2   : sarah.connor@support.com  / Employee@123\n";
 echo "  Client 1     : mike.johnson@acme.com     / Client@123\n";
