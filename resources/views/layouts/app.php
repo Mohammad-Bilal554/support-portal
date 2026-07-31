@@ -57,10 +57,10 @@ if (!function_exists('navIsActive')) {
         global $currentPath;
         $curr = is_string($currentPath) ? $currentPath : '/';
         $navPath = parse_url($url, PHP_URL_PATH);
-        if (!is_string($navPath) || $navPath === '') {
+        if (!is_string($navPath) || $navPath === '' || $navPath === '/') {
             return false;
         }
-        return str_starts_with($curr, $navPath) && $navPath !== '/';
+        return str_starts_with($curr, $navPath);
     }
 }
 
@@ -127,8 +127,9 @@ if (!function_exists('canSee')) {
                     // Unread ticket count badge
                     try {
                         $db = \App\Core\Database::getInstance();
+                        $userId = $user['id'] ?? 0;
                         if ($role === 'client') {
-                            $cnt = $db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE created_by=? AND status NOT IN ('closed','resolved')", [$user['id']]);
+                            $cnt = $db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE created_by=? AND status NOT IN ('closed','resolved')", [$userId]);
                         } else {
                             $cnt = $db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE status='open'");
                         }

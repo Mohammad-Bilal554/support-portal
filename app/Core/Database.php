@@ -10,7 +10,7 @@ class Database {
 
     private function connect(): void {
         $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
-            env('DB_HOST','127.0.0.1'), env('DB_PORT','3306'), env('DB_DATABASE','support_portal'));
+            env('DB_HOST','127.0.0.1'), env('DB_PORT','3307'), env('DB_DATABASE','support_portal'));
         try {
             $this->pdo = new \PDO($dsn, env('DB_USERNAME','root'), env('DB_PASSWORD',''), [
                 \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
@@ -20,7 +20,7 @@ class Database {
             ]);
         } catch (\PDOException $e) {
             Logger::getInstance()->error('DB connection failed: '.$e->getMessage());
-            throw new \RuntimeException('Database connection failed: ' . $e->getMessage() . '. Check your .env configuration.', 0, $e);
+            throw new \RuntimeException('Database connection failed. Check your .env configuration.');
         }
     }
     public static function getInstance(): static {

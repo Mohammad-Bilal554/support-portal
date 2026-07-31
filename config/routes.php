@@ -55,6 +55,7 @@ $router->group(['middleware'=>['auth','csrf']], function(Router $r) {
         $r->get('companies/{id}',   [\App\Controllers\Admin\CompanyController::class,'edit'])  ->name('admin.companies.edit');
         $r->post('companies/{id}',  [\App\Controllers\Admin\CompanyController::class,'update'])->name('admin.companies.update');
         $r->delete('companies/{id}',[\App\Controllers\Admin\CompanyController::class,'destroy'])->name('admin.companies.destroy');
+        $r->post('companies/{id}/toggle', [\App\Controllers\Admin\CompanyController::class,'toggle'])->name('admin.companies.toggle');
         $r->get('reports',               [\App\Controllers\Admin\ReportController::class,'index'])       ->name('admin.reports');
         $r->get('reports/export/pdf',    [\App\Controllers\Admin\ReportController::class,'exportPdf'])   ->name('admin.reports.pdf');
         $r->get('reports/export/excel',  [\App\Controllers\Admin\ReportController::class,'exportExcel']) ->name('admin.reports.excel');
