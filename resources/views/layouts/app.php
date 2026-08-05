@@ -52,22 +52,15 @@ $navItems = [
 // Current path for active detection
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
 
-if (!function_exists('navIsActive')) {
-    function navIsActive(string $url): bool {
-        global $currentPath;
-        $curr = is_string($currentPath) ? $currentPath : '/';
-        $navPath = parse_url($url, PHP_URL_PATH);
-        if (!is_string($navPath) || $navPath === '' || $navPath === '/') {
-            return false;
-        }
-        return str_starts_with($curr, $navPath);
-    }
+function navIsActive(string $url): bool {
+    global $currentPath;
+    $haystack = (string)($currentPath ?? '/');
+    $navPath  = parse_url($url, PHP_URL_PATH);
+    return !empty($navPath) && $navPath !== '/' && str_starts_with($haystack, $navPath);
 }
 
-if (!function_exists('canSee')) {
-    function canSee(array $item, string $role): bool {
-        return isset($item['roles']) && is_array($item['roles']) && in_array($role, $item['roles'], true);
-    }
+function canSee(array $item, string $role): bool {
+    return in_array($role, $item['roles']);
 }
 ?>
 <!DOCTYPE html>
@@ -127,9 +120,8 @@ if (!function_exists('canSee')) {
                     // Unread ticket count badge
                     try {
                         $db = \App\Core\Database::getInstance();
-                        $userId = $user['id'] ?? 0;
                         if ($role === 'client') {
-                            $cnt = $db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE created_by=? AND status NOT IN ('closed','resolved')", [$userId]);
+                            $cnt = $db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE created_by=? AND status NOT IN ('closed','resolved')", [$user['id']]);
                         } else {
                             $cnt = $db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE status='open'");
                         }

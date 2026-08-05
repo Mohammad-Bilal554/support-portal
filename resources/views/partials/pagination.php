@@ -57,6 +57,8 @@ $url      = rtrim($baseUrl ?? request_url(), '?');
     </nav>
 </div>
 <?php
-function request_url(): string {
-    return strtok($_SERVER['REQUEST_URI'] ?? '/', '?');
+if (!function_exists('request_url')) {
+    function request_url(): string {
+        return strtok($_SERVER['REQUEST_URI'] ?? '/', '?');
+    }
 }

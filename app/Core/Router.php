@@ -75,20 +75,17 @@ class Router {
     }
     private function runMiddleware(array $stack, Request $request, callable $final): void {
         if (empty($stack)) { $final(); return; }
-        $mw = array_shift($stack);
-        $parts = explode(':', (string)$mw, 2);
-        $mwName = $parts[0];
+        $mwSpec = array_shift($stack);
+        $parts = explode(':', $mwSpec, 2);
+        $mwAlias = $parts[0];
         $params = isset($parts[1]) ? explode(',', $parts[1]) : [];
         $map = [
             'auth'     => \App\Middleware\AuthMiddleware::class,
             'csrf'     => \App\Middleware\CsrfMiddleware::class,
             'role'     => \App\Middleware\RoleMiddleware::class,
-            'api.auth' => \App\Middleware\ApiAuthMiddleware::class,
+            'api.auth' => \App\Middleware\ApiAuthMiddleware::class
         ];
-        $class = $map[$mwName] ?? $mwName;
-        if (!class_exists($class)) {
-            throw new \RuntimeException("Middleware class [{$class}] not found.");
-        }
+        $class = $map[$mwAlias] ?? $mwAlias;
         $instance = new $class(...$params);
         $instance->handle($request, function() use ($stack, $request, $final) {
             $this->runMiddleware($stack, $request, $final);
