@@ -28,10 +28,21 @@ class Request {
     public function isJson(): bool   { return str_contains($this->header('Content-Type')??'','application/json'); }
     public function uri(): string    { return $this->serverParams['REQUEST_URI']??'/'; }
     public function pathInfo(): string {
-        $uri = parse_url($this->uri(),PHP_URL_PATH) ?? '/';
-        $dir = dirname($this->serverParams['SCRIPT_NAME']??'');
-        if ($dir!=='/'&&$dir!=='\\') $uri = preg_replace('#^'.preg_quote($dir,'#').'#','',$uri);
-        return '/'.ltrim($uri,'/');
+        $uri = parse_url($this->uri(), PHP_URL_PATH) ?? '/';
+        $scriptName = str_replace('\\', '/', $this->serverParams['SCRIPT_NAME'] ?? '');
+        $dir = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+
+        if ($dir !== '' && $dir !== '/' && $dir !== '.') {
+            if (str_starts_with($uri, $dir)) {
+                $uri = substr($uri, strlen($dir));
+            } else {
+                $dirNoPublic = preg_replace('#/public$#', '', $dir);
+                if ($dirNoPublic !== '' && $dirNoPublic !== '/' && str_starts_with($uri, $dirNoPublic)) {
+                    $uri = substr($uri, strlen($dirNoPublic));
+                }
+            }
+        }
+        return '/' . ltrim($uri, '/');
     }
     public function fullUrl(): string {
         $s = isset($this->serverParams['HTTPS'])&&$this->serverParams['HTTPS']!=='off'?'https':'http';

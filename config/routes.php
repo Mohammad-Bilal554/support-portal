@@ -16,10 +16,13 @@ $router->group(['prefix' => 'auth'], function (Router $r) {
     $r->post('reset-password/{token}', [\App\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('auth.reset.post');
 });
 
+// ── Dashboard (authenticated) ─────────────────────────────────────────────
+$router->get('dashboard', [\App\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard')->middleware(['auth']);
+
 // ── Admin (authenticated + admin/employee role) ────────────────────────────
 $router->group(['prefix' => 'admin', 'middleware' => ['auth', 'role:super_admin,employee']], function (Router $r) {
 
-    // Dashboard
+    // Dashboard alias
     $r->get('dashboard', [\App\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Users
@@ -130,6 +133,6 @@ $router->group(['prefix' => 'api/v1', 'middleware' => ['api_auth']], function (R
 
 // ── Root redirect ──────────────────────────────────────────────────────────
 $router->get('', function () {
-    header('Location: ' . url('admin/dashboard'));
+    header('Location: ' . url('dashboard'));
     exit;
 });
