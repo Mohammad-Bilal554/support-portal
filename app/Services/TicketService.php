@@ -9,13 +9,15 @@ use App\Models\User;
 
 class TicketService
 {
-    private Database $db;
-    private Logger   $logger;
+    private Database     $db;
+    private Logger       $logger;
+    private EmailService $emailService;
 
     public function __construct()
     {
-        $this->db     = Database::getInstance();
-        $this->logger = Logger::getInstance();
+        $this->db           = Database::getInstance();
+        $this->logger       = Logger::getInstance();
+        $this->emailService = new EmailService();
     }
 
     // ── Create ticket ─────────────────────────────────────────────
@@ -57,6 +59,24 @@ class TicketService
             "Ticket created: {$ticketNumber} — {$insertData['subject']}");
 
         $this->logger->info("Ticket created: #{$ticketId} {$ticketNumber}");
+
+        // Send email notifications (non-blocking)
+        try {
+            $fullTicket = Ticket::findWithDetails($ticketId);
+            $creator    = \App\Models\User::find($creatorId);
+            if ($fullTicket && $creator) {
+                $this->emailService->notifyNewTicket($fullTicket, $creator);
+                // If auto-assigned, also send assignment notification
+                if (!empty($insertData['assigned_to'])) {
+                    $assignee = \App\Models\User::find((int)$insertData['assigned_to']);
+                    if ($assignee) {
+                        $this->emailService->notifyTicketAssigned($fullTicket, $assignee, $creator);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            $this->logger->error('Email notification failed: ' . $e->getMessage());
+        }
 
         return [
             'success'   => true,
@@ -120,6 +140,21 @@ class TicketService
         $this->logActivity($userId, 'status_changed', 'ticket', $ticketId,
             "Status changed: {$oldStatus} → {$newStatus}");
 
+        // Email notifications
+        try {
+            $fullTicket = Ticket::findWithDetails($ticketId);
+            $changer    = \App\Models\User::find($userId);
+            if ($fullTicket && $changer) {
+                if ($newStatus === 'resolved') {
+                    $this->emailService->notifyTicketResolved($fullTicket, $changer);
+                } else {
+                    $this->emailService->notifyStatusChanged($fullTicket, $oldStatus, $newStatus, $changer);
+                }
+            }
+        } catch (\Throwable $e) {
+            $this->logger->error('Email notification failed: ' . $e->getMessage());
+        }
+
         return [
             'success'    => true,
             'message'    => 'Status updated successfully.',
@@ -153,6 +188,17 @@ class TicketService
 
         $this->logActivity($assignedById, 'ticket_assigned', 'ticket', $ticketId,
             "Ticket assigned to: " . User::fullName($assignee));
+
+        // Email notification
+        try {
+            $fullTicket = Ticket::findWithDetails($ticketId);
+            $assigner   = \App\Models\User::find($assignedById);
+            if ($fullTicket && $assigner) {
+                $this->emailService->notifyTicketAssigned($fullTicket, $assignee, $assigner);
+            }
+        } catch (\Throwable $e) {
+            $this->logger->error('Email notification failed: ' . $e->getMessage());
+        }
 
         return [
             'success'  => true,
@@ -205,6 +251,19 @@ class TicketService
 
         $this->logActivity($userId, 'reply_added', 'ticket', $ticketId,
             $isInternal ? 'Internal note added' : 'Reply added to ticket');
+
+        // Email notification
+        if (!$isInternal) {
+            try {
+                $fullTicket = Ticket::findWithDetails($ticketId);
+                $replier    = \App\Models\User::find($userId);
+                if ($fullTicket && $replier) {
+                    $this->emailService->notifyTicketReply($fullTicket, $replier, $message, false);
+                }
+            } catch (\Throwable $e) {
+                $this->logger->error('Email notification failed: ' . $e->getMessage());
+            }
+        }
 
         // Fetch full conversation row for response
         $conv = $this->db->fetchOne(

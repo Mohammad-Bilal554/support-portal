@@ -239,10 +239,10 @@ function canSee(array $item, string $role): bool {
                     <div class="dropdown-menu dropdown-menu-end notif-dropdown p-0" style="border-radius:14px;">
                         <div class="notif-header">
                             <span>Notifications</span>
-                            <a href="#" class="text-primary" style="font-size:.8rem;font-weight:500;">Mark all read</a>
+                            <a href="#" class="text-primary" style="font-size:.8rem;font-weight:500;" data-mark-all-read>Mark all read</a>
                         </div>
                         <div id="notifList">
-                            <div class="empty-state py-4">
+                            <div class="empty-state py-4" id="notifEmpty">
                                 <i class="bi bi-bell-slash" style="font-size:2rem;color:var(--text-muted);display:block;margin-bottom:.5rem;opacity:.4;"></i>
                                 <p style="font-size:.8rem;color:var(--text-muted);margin:0;">No new notifications</p>
                             </div>
@@ -350,6 +350,7 @@ function canSee(array $item, string $role): bool {
 <script src="<?= asset('js/app.js') ?>"></script>
 
 <?php if (isset($extraJs)) echo $extraJs; ?>
+<script src="<?= asset('js/notifications.js') ?>"></script>
 
 </body>
 </html>

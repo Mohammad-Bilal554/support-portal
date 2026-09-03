@@ -83,7 +83,8 @@ class Router {
             'auth'     => \App\Middleware\AuthMiddleware::class,
             'csrf'     => \App\Middleware\CsrfMiddleware::class,
             'role'     => \App\Middleware\RoleMiddleware::class,
-            'api.auth' => \App\Middleware\ApiAuthMiddleware::class
+            'api.auth' => \App\Middleware\ApiAuthMiddleware::class,
+            'api_auth' => \App\Middleware\ApiAuthMiddleware::class
         ];
         $class = $map[$mwAlias] ?? $mwAlias;
         $instance = new $class(...$params);
