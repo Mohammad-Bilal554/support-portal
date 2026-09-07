@@ -192,7 +192,6 @@ if (!function_exists('render_pagination')) {
     }
 }
 
-// ── UI helpers added in Module 3 ────────────────────────────────
 
 if (!function_exists('format_datetime')) {
     function format_datetime(string $datetime, string $format = 'd M Y, H:i'): string {

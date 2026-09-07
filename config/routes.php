@@ -53,9 +53,6 @@ $router->group(['prefix' => 'admin', 'middleware' => ['auth', 'role:super_admin,
     $r->post('settings',[\App\Controllers\Admin\SettingsController::class, 'update'])->name('admin.settings.update');
     $r->get('logs',     [\App\Controllers\Admin\ActivityLogController::class, 'index'])->name('admin.logs');
 
-    // Email test (local env only)
-    $r->get('email-test',  [\App\Controllers\Admin\EmailTestController::class, 'show'])->name('admin.email.test');
-    $r->post('email-test', [\App\Controllers\Admin\EmailTestController::class, 'send'])->name('admin.email.test.post');
 });
 
 // ── Tickets (authenticated) ────────────────────────────────────────────────

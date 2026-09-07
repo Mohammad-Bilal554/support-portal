@@ -1,4 +1,4 @@
-# Support Portal – Module 1: Core Framework
+# Support Portal
 
 ## Setup Instructions
 
@@ -56,4 +56,3 @@ location ~ \.php$ { fastcgi_pass unix:/run/php/php8.1-fpm.sock; include fastcgi_
 | Employee    | john.smith@support.com   | Employee@123 |
 | Client      | mike.johnson@acme.com    | Client@123   |
 
-## Module 1 Files: 56 files | 4,617 PHP lines
