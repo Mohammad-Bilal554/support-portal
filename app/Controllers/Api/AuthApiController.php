@@ -24,7 +24,7 @@ class AuthApiController extends ApiController
 
     /**
      * POST /api/v1/auth/token
-     * Generate API token — does NOT require existing token.
+     * Generate API token – does NOT require existing token.
      */
     public function token(Request $request): string
     {
@@ -65,7 +65,7 @@ class AuthApiController extends ApiController
         ]);
 
         return $this->success([
-            'token'      => $plainToken,   // Only shown ONCE — store it securely
+            'token'      => $plainToken,   // Only shown ONCE – store it securely
             'token_id'   => (int)$tokenId,
             'name'       => $name,
             'expires_at' => $expiresAt,
@@ -75,7 +75,7 @@ class AuthApiController extends ApiController
                 'email' => $user['email'],
                 'role'  => $user['role'],
             ],
-        ], 'API token generated. Store it securely — it will not be shown again.');
+        ], 'API token generated. Store it securely – it will not be shown again.');
     }
 
     /**

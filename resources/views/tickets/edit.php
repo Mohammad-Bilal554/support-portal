@@ -131,7 +131,7 @@ ob_start();
                         <?php foreach ([
                             ['Reporter', htmlspecialchars(trim(($t['creator_first']??'').' '.($t['creator_last']??'')))],
                             ['Assignee', $t['assignee_first'] ? htmlspecialchars(trim($t['assignee_first'].' '.$t['assignee_last'])) : '<span class="text-muted">Unassigned</span>'],
-                            ['Company',  htmlspecialchars($t['company_name'] ?? '—')],
+                            ['Company',  htmlspecialchars($t['company_name'] ?? '–')],
                             ['Created',  format_date($t['created_at'])],
                         ] as [$lbl, $val]): ?>
                         <div class="d-flex justify-content-between mb-1">

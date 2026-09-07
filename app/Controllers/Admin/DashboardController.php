@@ -128,10 +128,10 @@ class DashboardController extends Controller
 
         } catch (\Throwable $e) {
             return [
-                ['label'=>'Total Tickets',  'value'=>'—','icon'=>'bi-ticket-perforated-fill','color'=>'bg-primary bg-opacity-10 text-primary'],
-                ['label'=>'Open',           'value'=>'—','icon'=>'bi-folder2-open',          'color'=>'bg-danger bg-opacity-10 text-danger'],
-                ['label'=>'In Progress',    'value'=>'—','icon'=>'bi-hourglass-split',       'color'=>'bg-warning bg-opacity-10 text-warning'],
-                ['label'=>'Resolved Today', 'value'=>'—','icon'=>'bi-check-circle-fill',     'color'=>'bg-success bg-opacity-10 text-success'],
+                ['label'=>'Total Tickets',  'value'=>'–','icon'=>'bi-ticket-perforated-fill','color'=>'bg-primary bg-opacity-10 text-primary'],
+                ['label'=>'Open',           'value'=>'–','icon'=>'bi-folder2-open',          'color'=>'bg-danger bg-opacity-10 text-danger'],
+                ['label'=>'In Progress',    'value'=>'–','icon'=>'bi-hourglass-split',       'color'=>'bg-warning bg-opacity-10 text-warning'],
+                ['label'=>'Resolved Today', 'value'=>'–','icon'=>'bi-check-circle-fill',     'color'=>'bg-success bg-opacity-10 text-success'],
             ];
         }
     }

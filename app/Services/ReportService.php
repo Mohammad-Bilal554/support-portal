@@ -218,7 +218,7 @@ class ReportService
 
     private function buildReportHtml(array $summary, array $byStatus, array $byPriority, array $employees, array $tickets, string $appName): string
     {
-        $dateRange = date('d M Y', strtotime($summary['date_from'])) . ' — ' . date('d M Y', strtotime($summary['date_to']));
+        $dateRange = date('d M Y', strtotime($summary['date_from'])) . ' – ' . date('d M Y', strtotime($summary['date_to']));
         $generated = date('d M Y, H:i');
 
         $statusRows = '';
@@ -232,7 +232,7 @@ class ReportService
         $employeeRows = '';
         foreach ($employees as $e) {
             $name = htmlspecialchars(trim($e['first_name'] . ' ' . $e['last_name']));
-            $avg  = $e['avg_resolution_hours'] ? round((float)$e['avg_resolution_hours'], 1) . 'h' : '—';
+            $avg  = $e['avg_resolution_hours'] ? round((float)$e['avg_resolution_hours'], 1) . 'h' : '–';
             $employeeRows .= "<tr><td>{$name}</td><td style='text-align:center;'>{$e['total_assigned']}</td><td style='text-align:center;'>{$e['resolved']}</td><td style='text-align:center;'>{$e['open']}</td><td style='text-align:center;'>{$avg}</td></tr>";
         }
         $ticketRows = '';
@@ -242,7 +242,7 @@ class ReportService
                 <td>' . htmlspecialchars(mb_substr($t['subject'], 0, 45)) . '</td>
                 <td>' . ucwords(str_replace('_', ' ', $t['status'])) . '</td>
                 <td>' . ucfirst($t['priority']) . '</td>
-                <td>' . htmlspecialchars($t['company'] ?? '—') . '</td>
+                <td>' . htmlspecialchars($t['company'] ?? '–') . '</td>
                 <td>' . htmlspecialchars($t['assigned_to'] ?? 'Unassigned') . '</td>
                 <td>' . date('d M Y', strtotime($t['created_at'])) . '</td>
             </tr>';
@@ -262,7 +262,7 @@ tr:nth-child(even) td{background:#f8fafc;}
 .box .lbl{font-size:8px;color:#64748b;}
 .footer{font-size:8px;color:#94a3b8;margin-top:10px;text-align:center;}
 </style></head><body>
-<h1>📊 ' . $appName . ' — Ticket Report</h1>
+<h1>📊 ' . $appName . ' – Ticket Report</h1>
 <p class="meta">Period: ' . $dateRange . ' &nbsp;|&nbsp; Generated: ' . $generated . '</p>
 <h2>Executive Summary</h2>
 <div>
@@ -319,7 +319,7 @@ tr:nth-child(even) td{background:#f8fafc;}
         // Sheet 1: Summary
         $s1 = $ss->getActiveSheet()->setTitle('Summary');
         $dateLabel = date('d M Y', strtotime($summary['date_from'])) . ' to ' . date('d M Y', strtotime($summary['date_to']));
-        $s1->setCellValue('A1', "Ticket Report — {$dateLabel}");
+        $s1->setCellValue('A1', "Ticket Report – {$dateLabel}");
         $s1->mergeCells('A1:B1');
         $s1->getStyle('A1')->applyFromArray($blueStyle);
         $s1->getRowDimension(1)->setRowHeight(24);
@@ -400,7 +400,7 @@ tr:nth-child(even) td{background:#f8fafc;}
         $path     = storage_path("exports/{$filename}");
         if (!is_dir(dirname($path))) mkdir(dirname($path), 0755, true);
         $fp = fopen($path, 'w');
-        fputcsv($fp, ['Ticket Report — Generated ' . date('d M Y H:i')]);
+        fputcsv($fp, ['Ticket Report – Generated ' . date('d M Y H:i')]);
         fputcsv($fp, ['Period', $summary['date_from'] . ' to ' . $summary['date_to']]);
         fputcsv($fp, []);
         fputcsv($fp, ['Ticket #','Subject','Status','Priority','Category','Company','Created By','Assigned To','Created At','Resolved At','Hours Open']);

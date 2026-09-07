@@ -79,7 +79,7 @@ class AuthService
             return ['success' => false, 'message' => 'Your account has been deactivated. Please contact support.'];
         }
 
-        // 5. Success — set up session
+        // 5. Success – set up session
         User::clearLoginAttempts($email, $ip);
         User::updateLastLogin((int) $user['id']);
 

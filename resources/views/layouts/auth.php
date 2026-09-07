@@ -1,7 +1,7 @@
 <?php
 $appName    = env('APP_NAME', 'Support Portal');
 $appUrl     = env('APP_URL', '');
-$pageTitle  = ($title ?? 'Auth') . ' — ' . $appName;
+$pageTitle  = ($title ?? 'Auth') . ' – ' . $appName;
 $session    = \App\Core\Session::getInstance();
 $flashSuccess = $session->getFlash('success');
 $flashError   = $session->getFlash('error');

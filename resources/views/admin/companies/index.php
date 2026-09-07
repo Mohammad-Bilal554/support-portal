@@ -155,7 +155,7 @@ ob_start();
                             <?= (int)$c['open_tickets'] ?>
                         </span>
                         <?php else: ?>
-                        <span class="text-muted" style="font-size:.8rem;">—</span>
+                        <span class="text-muted" style="font-size:.8rem;">–</span>
                         <?php endif; ?>
                     </td>
                     <td>

@@ -47,7 +47,7 @@ class SettingsController extends Controller
         $tab  = $request->input('_tab', 'general');
         $data = $request->except(['_csrf_token', '_tab']);
 
-        // Handle boolean fields — unchecked checkboxes aren't in POST
+        // Handle boolean fields – unchecked checkboxes aren't in POST
         $group = Setting::getGroup($tab);
         foreach ($group as $key => $def) {
             if ($def['type'] === 'boolean') {

@@ -145,7 +145,7 @@ ob_start();
                     </td>
                     <td><?= role_badge($u['role']) ?></td>
                     <td style="font-size:.85rem;">
-                        <?= $u['company_name'] ? htmlspecialchars($u['company_name']) : '<span class="text-muted">—</span>' ?>
+                        <?= $u['company_name'] ? htmlspecialchars($u['company_name']) : '<span class="text-muted">–</span>' ?>
                     </td>
                     <td>
                         <?php if ($u['is_active']): ?>

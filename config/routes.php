@@ -85,7 +85,7 @@ $router->group(['prefix' => 'api', 'middleware' => ['auth']], function (Router $
 
 // ── REST API v1 (token auth) ───────────────────────────────────────────────
 
-// Token generation — no auth middleware
+// Token generation – no auth middleware
 $router->group(['prefix' => 'api/v1/auth'], function (Router $r) {
     $r->post('token', [\App\Controllers\Api\AuthApiController::class, 'token'])->name('api.auth.token');
 });

@@ -126,7 +126,7 @@ class CompanyService
             $this->deleteLogo($company['logo']);
         }
 
-        // Soft delete — deactivate instead of hard delete
+        // Soft delete – deactivate instead of hard delete
         Company::updateById($id, ['is_active' => 0]);
 
         $this->logActivity(

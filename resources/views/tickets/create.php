@@ -86,7 +86,7 @@ ob_start();
                                 Drag & drop files here, or <label for="attachments" style="color:var(--primary);cursor:pointer;font-weight:500;">browse</label>
                             </div>
                             <div style="font-size:.75rem;color:var(--text-muted);margin-top:.3rem;">
-                                PDF, DOC, XLS, PNG, JPG, ZIP — Max 10MB each
+                                PDF, DOC, XLS, PNG, JPG, ZIP – Max 10MB each
                             </div>
                             <input type="file" name="attachments[]" id="attachments"
                                    multiple class="d-none"

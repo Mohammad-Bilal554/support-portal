@@ -51,7 +51,7 @@ ob_start();
             <div class="card-header"><span>Account Details</span></div>
             <div class="card-body p-0">
                 <?php foreach ([
-                    ['Company',       $editUser['company_name'] ?? '—', 'bi-building'],
+                    ['Company',       $editUser['company_name'] ?? '–', 'bi-building'],
                     ['Last Login',    $editUser['last_login'] ? time_ago($editUser['last_login']) : 'Never', 'bi-clock'],
                     ['Member Since',  format_date($editUser['created_at']), 'bi-calendar'],
                     ['Email Verified',$editUser['email_verified'] ? 'Yes' : 'No', 'bi-envelope-check'],

@@ -52,7 +52,7 @@ class ApiAuthMiddleware
             return $this->unauthorized('API token has expired.');
         }
 
-        // Rate limiting — 60 requests per minute per token
+        // Rate limiting – 60 requests per minute per token
         if (!$this->checkRateLimit((int)$apiToken['id'])) {
             return $this->tooManyRequests();
         }

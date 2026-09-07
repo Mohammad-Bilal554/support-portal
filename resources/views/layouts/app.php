@@ -23,7 +23,7 @@ $fullName = User::fullName($user);
 $roleLabels = ['super_admin'=>'Super Admin','employee'=>'Employee','client'=>'Client'];
 $roleLabel  = $roleLabels[$role] ?? ucfirst($role);
 $avatarUrl  = User::avatarUrl($user);
-$pageTitle  = ($title ?? 'Dashboard') . ' — ' . $appName;
+$pageTitle  = ($title ?? 'Dashboard') . ' – ' . $appName;
 $csrfToken  = Csrf::getToken();
 
 // Flash messages

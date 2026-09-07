@@ -56,7 +56,7 @@ class TicketService
 
         // Log activity
         $this->logActivity($creatorId, 'ticket_created', 'ticket', $ticketId,
-            "Ticket created: {$ticketNumber} — {$insertData['subject']}");
+            "Ticket created: {$ticketNumber} – {$insertData['subject']}");
 
         $this->logger->info("Ticket created: #{$ticketId} {$ticketNumber}");
 

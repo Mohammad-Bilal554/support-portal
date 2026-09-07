@@ -61,7 +61,7 @@ $replierRole = match($replier['role'] ?? 'client') {
 
             <!-- Message body -->
             <div style="font-size:14px;color:#374151;line-height:1.75;white-space:pre-wrap;">
-<?= htmlspecialchars(mb_substr($message ?? '', 0, 600)) ?><?= strlen($message ?? '') > 600 ? "\n\n[Message truncated — click button below to read full reply]" : '' ?>
+<?= htmlspecialchars(mb_substr($message ?? '', 0, 600)) ?><?= strlen($message ?? '') > 600 ? "\n\n[Message truncated – click button below to read full reply]" : '' ?>
             </div>
         </td>
     </tr>
@@ -84,7 +84,7 @@ $replierRole = match($replier['role'] ?? 'client') {
        style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;margin:0 0 20px;">
     <tr>
         <td style="padding:12px 16px;font-size:13px;color:#166534;">
-            💡 <strong>Tip:</strong> You can reply directly from the portal —
+            💡 <strong>Tip:</strong> You can reply directly from the portal –
             <a href="<?= htmlspecialchars($ticketUrl) ?>" style="color:#166534;">click here to respond</a>.
         </td>
     </tr>

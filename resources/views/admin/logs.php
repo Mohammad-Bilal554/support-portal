@@ -83,13 +83,13 @@ ob_start();
                             <?= htmlspecialchars($log['entity_type']) ?>
                             <?= $log['entity_id'] ? '#'.$log['entity_id'] : '' ?>
                         </code>
-                        <?php else: ?>—<?php endif; ?>
+                        <?php else: ?>–<?php endif; ?>
                     </td>
                     <td style="font-size:.82rem;max-width:250px;" class="text-truncate">
-                        <?= htmlspecialchars($log['description'] ?? '—') ?>
+                        <?= htmlspecialchars($log['description'] ?? '–') ?>
                     </td>
                     <td style="font-size:.78rem;color:var(--text-muted);font-family:monospace;">
-                        <?= htmlspecialchars($log['ip_address'] ?? '—') ?>
+                        <?= htmlspecialchars($log['ip_address'] ?? '–') ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

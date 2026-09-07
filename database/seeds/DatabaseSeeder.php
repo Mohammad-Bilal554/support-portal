@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 /**
- * Database Seeder — run: php database/seeds/DatabaseSeeder.php
+ * Database Seeder – run: php database/seeds/DatabaseSeeder.php
  */
 define('BASE_PATH', dirname(__DIR__, 2));
 require_once BASE_PATH . '/vendor/autoload.php';

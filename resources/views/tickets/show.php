@@ -320,7 +320,7 @@ ob_start();
                     ['Created',   format_datetime($t['created_at']), 'bi-calendar', true],
                     ['Updated',   time_ago($t['updated_at'] ?? $t['created_at']), 'bi-clock', true],
                     ['Reporter',  htmlspecialchars(trim(($t['creator_first']??'').' '.($t['creator_last']??''))), 'bi-person', true],
-                    ['Company',   htmlspecialchars($t['company_name'] ?? '—'), 'bi-building', true],
+                    ['Company',   htmlspecialchars($t['company_name'] ?? '–'), 'bi-building', true],
                     ['Due Date',  $t['due_date'] ? format_date($t['due_date']) : '<span class="text-muted">Not set</span>', 'bi-calendar-event', false],
                 ];
                 foreach ($details as [$label, $val, $icon, $escape]):
@@ -453,7 +453,7 @@ function setReplyType(internal) {
     if (internal) {
         card.style.borderColor = '#ffc107';
         ta.style.background    = '#fffbeb';
-        ta.placeholder         = 'Internal note — only visible to staff…';
+        ta.placeholder         = 'Internal note – only visible to staff…';
         document.getElementById('btnInternal').className = 'btn btn-sm btn-warning';
         document.getElementById('btnPublic').className   = 'btn btn-sm btn-outline-primary';
     } else {

@@ -242,12 +242,12 @@ $actionIcons = [
                             #<?= $log['entity_id'] ?>
                         </span>
                         <?php else: ?>
-                        <span class="text-muted">—</span>
+                        <span class="text-muted">–</span>
                         <?php endif; ?>
                     </td>
 
                     <td style="color:var(--text-muted);font-family:monospace;font-size:.78rem;">
-                        <?= htmlspecialchars($log['ip_address'] ?? '—') ?>
+                        <?= htmlspecialchars($log['ip_address'] ?? '–') ?>
                     </td>
 
                     <td style="white-space:nowrap;color:var(--text-muted);"

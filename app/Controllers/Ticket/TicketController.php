@@ -149,7 +149,7 @@ class TicketController extends Controller
         $transitions = Ticket::TRANSITIONS[$user['role']][$ticket['status']] ?? [];
 
         return $this->view('tickets.show', [
-            'title'         => $ticket['ticket_number'] . ' — ' . $ticket['subject'],
+            'title'         => $ticket['ticket_number'] . ' – ' . $ticket['subject'],
             'ticket'        => $ticket,
             'conversations' => $conversations,
             'attachments'   => $attachments,

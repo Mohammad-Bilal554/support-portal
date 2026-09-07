@@ -247,7 +247,7 @@ ob_start();
             <tbody>
                 <?php foreach ($employees as $emp):
                     $rate     = $emp['total_assigned'] > 0 ? round((int)$emp['resolved'] / (int)$emp['total_assigned'] * 100) : 0;
-                    $avgH     = $emp['avg_resolution_hours'] ? round((float)$emp['avg_resolution_hours'], 1) . 'h' : '—';
+                    $avgH     = $emp['avg_resolution_hours'] ? round((float)$emp['avg_resolution_hours'], 1) . 'h' : '–';
                     $barColor = $rate >= 70 ? 'bg-success' : ($rate >= 40 ? 'bg-warning' : 'bg-danger');
                 ?>
                 <tr>
@@ -313,16 +313,16 @@ ob_start();
                     <td class="text-center">
                         <?php if ((int)$c['open'] > 0): ?>
                         <span class="badge bg-danger bg-opacity-10 text-danger"><?= (int)$c['open'] ?></span>
-                        <?php else: ?><span class="text-muted">—</span><?php endif; ?>
+                        <?php else: ?><span class="text-muted">–</span><?php endif; ?>
                     </td>
                     <td class="text-center"><span class="badge bg-success bg-opacity-10 text-success"><?= (int)$c['resolved'] ?></span></td>
                     <td class="text-center">
                         <?php if ((int)$c['critical'] > 0): ?>
                         <span class="badge bg-dark bg-opacity-10 text-dark"><?= (int)$c['critical'] ?></span>
-                        <?php else: ?><span class="text-muted">—</span><?php endif; ?>
+                        <?php else: ?><span class="text-muted">–</span><?php endif; ?>
                     </td>
                     <td class="text-center" style="font-size:.85rem;">
-                        <?= $c['avg_resolution_hours'] ? round((float)$c['avg_resolution_hours'], 1) . 'h' : '—' ?>
+                        <?= $c['avg_resolution_hours'] ? round((float)$c['avg_resolution_hours'], 1) . 'h' : '–' ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

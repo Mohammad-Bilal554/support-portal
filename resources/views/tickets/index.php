@@ -161,14 +161,14 @@ ob_start();
                             <?= htmlspecialchars($t['category_name']) ?>
                         </span>
                         <?php else: ?>
-                        <span class="text-muted" style="font-size:.8rem;">—</span>
+                        <span class="text-muted" style="font-size:.8rem;">–</span>
                         <?php endif; ?>
                     </td>
                     <td><?= status_badge($t['status']) ?></td>
                     <td><?= priority_badge($t['priority']) ?></td>
                     <?php if (in_array($user['role'], ['super_admin','employee'])): ?>
                     <td style="font-size:.82rem;">
-                        <?= htmlspecialchars(trim(($t['creator_first']??'').' '.($t['creator_last']??''))) ?: '—' ?>
+                        <?= htmlspecialchars(trim(($t['creator_first']??'').' '.($t['creator_last']??''))) ?: '–' ?>
                     </td>
                     <td style="font-size:.82rem;">
                         <?php if ($t['assignee_first']): ?>

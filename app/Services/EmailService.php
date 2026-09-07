@@ -181,7 +181,7 @@ class EmailService
      */
     public function notifyStatusChanged(array $ticket, string $oldStatus, string $newStatus, array $changedBy): void
     {
-        // Handled specifically for resolved/assigned — skip generic for those
+        // Handled specifically for resolved/assigned – skip generic for those
         if (in_array($newStatus, ['resolved', 'assigned'])) return;
 
         $recipients = $this->getTicketRecipients($ticket, (int)$changedBy['id']);
@@ -233,7 +233,7 @@ class EmailService
         return $this->send(
             $toEmail,
             $toName,
-            "Reset Your Password — " . env('APP_NAME', 'Support Portal'),
+            "Reset Your Password – " . env('APP_NAME', 'Support Portal'),
             $this->renderTemplate('password-reset', [
                 'name'         => $toName,
                 'resetUrl'     => $resetUrl,
@@ -253,7 +253,7 @@ class EmailService
         array  $attachments = []
     ): bool {
         if (!$this->enabled) {
-            $this->logger->info("Email skipped (disabled): {$toEmail} — {$subject}");
+            $this->logger->info("Email skipped (disabled): {$toEmail} – {$subject}");
             return true;
         }
 
@@ -322,7 +322,7 @@ class EmailService
         }
 
         $mail->send();
-        $this->logger->info("Email sent [{$driver}]: {$toEmail} — {$subject}");
+        $this->logger->info("Email sent [{$driver}]: {$toEmail} – {$subject}");
         return true;
     }
 
@@ -342,9 +342,9 @@ class EmailService
         $result = mail("{$toName} <{$toEmail}>", $subject, $body, $headers);
 
         if ($result) {
-            $this->logger->info("Email sent [mail()]: {$toEmail} — {$subject}");
+            $this->logger->info("Email sent [mail()]: {$toEmail} – {$subject}");
         } else {
-            $this->logger->error("Email failed [mail()]: {$toEmail} — {$subject}");
+            $this->logger->error("Email failed [mail()]: {$toEmail} – {$subject}");
         }
 
         return $result;
