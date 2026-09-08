@@ -1,4 +1,9 @@
 <?php
+/**
+ * @var array $ticket
+ * @var array $authUser
+ * @var array $categories
+ */
 use App\Core\Session;
 use App\Core\Csrf;
 use App\Models\User;
@@ -7,8 +12,9 @@ use App\Models\Ticket;
 $session   = Session::getInstance();
 $errors    = $session->getFlash('errors') ?? [];
 $csrfToken = Csrf::getToken();
-$t         = $ticket;
-$user      = $authUser;
+$t         = $ticket ?? [];
+$user      = $authUser ?? [];
+$categories= $categories ?? [];
 $title     = 'Edit Ticket';
 ob_start();
 ?>

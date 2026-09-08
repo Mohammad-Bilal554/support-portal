@@ -1,6 +1,8 @@
 <?php
 /**
  * Edit User View
+ * @var array $editUser
+ * @var array $companies
  */
 use App\Core\Session;
 use App\Core\Csrf;
@@ -10,7 +12,8 @@ $session   = Session::getInstance();
 $errors    = $session->getFlash('errors') ?? [];
 $old       = $session->getFlash('old')    ?? [];
 $csrfToken = Csrf::getToken();
-$u         = $editUser; // the user being edited
+$u         = $editUser ?? [];
+$companies = $companies ?? [];
 $title     = 'Edit User';
 ob_start();
 ?>
