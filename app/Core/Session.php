@@ -8,14 +8,22 @@ class Session {
         if (!static::$instance) static::$instance = new static();
         return static::$instance;
     }
-    public function set(string $key, mixed $value): void { $_SESSION[$key] = $value; }
+    private function startIfNeeded(): void {
+        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+            session_start();
+        }
+    }
+    public function set(string $key, mixed $value): void { $this->startIfNeeded(); $_SESSION[$key] = $value; }
     public function get(string $key, mixed $default = null): mixed { return $_SESSION[$key] ?? $default; }
     public function has(string $key): bool { return isset($_SESSION[$key]); }
-    public function remove(string $key): void { unset($_SESSION[$key]); }
-    public function setFlash(string $key, mixed $value): void { $_SESSION['_flash'][$key] = $value; }
+    public function remove(string $key): void { $this->startIfNeeded(); unset($_SESSION[$key]); }
+    public function setFlash(string $key, mixed $value): void { $this->startIfNeeded(); $_SESSION['_flash'][$key] = $value; }
     public function getFlash(string $key, mixed $default = null): mixed {
         $value = $_SESSION['_flash'][$key] ?? $default;
-        unset($_SESSION['_flash'][$key]);
+        if (isset($_SESSION['_flash'][$key])) {
+            $this->startIfNeeded();
+            unset($_SESSION['_flash'][$key]);
+        }
         return $value;
     }
     public function hasFlash(string $key): bool { return isset($_SESSION['_flash'][$key]); }
@@ -29,15 +37,22 @@ class Session {
     public function isLoggedIn(): bool { return $this->has('auth_user'); }
     public function getUserId(): ?int { $u=$this->getUser(); return $u ? (int)$u['id'] : null; }
     public function getUserRole(): ?string { return $this->getUser()['role'] ?? null; }
+    public function close(): void {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+    }
     public function regenerate(bool $deleteOld = true): void {
+        $this->startIfNeeded();
         if (session_status() === PHP_SESSION_ACTIVE) session_regenerate_id($deleteOld);
     }
     public function destroy(): void {
+        $this->startIfNeeded();
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
             $p = session_get_cookie_params();
             setcookie(session_name(), '', time()-42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
         }
-        session_destroy();
+        if (session_status() === PHP_SESSION_ACTIVE) session_destroy();
     }
 }

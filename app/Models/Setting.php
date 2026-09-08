@@ -49,38 +49,57 @@ class Setting
 
     // ── Get/Set ───────────────────────────────────────────────────
 
+    private static bool $loaded = false;
+
+    public static function preload(): void
+    {
+        if (self::$loaded) return;
+        try {
+            $db = Database::getInstance();
+            $rows = $db->fetchAll("SELECT key_name, value FROM settings");
+            foreach ($rows as $r) {
+                self::$cache[$r['key_name']] = $r['value'];
+            }
+        } catch (\Throwable $e) {}
+        self::$loaded = true;
+    }
+
     public static function get(string $key, mixed $default = null): mixed
     {
-        if (isset(self::$cache[$key])) {
+        if (!self::$loaded) {
+            self::preload();
+        }
+
+        if (array_key_exists($key, self::$cache)) {
             return self::$cache[$key];
         }
 
-        $db  = Database::getInstance();
-        $row = $db->fetchOne(
-            "SELECT value FROM settings WHERE key_name = ?",
-            [$key]
-        );
-
-        $value = $row ? $row['value'] : ($default ?? self::DEFAULTS[$key]['value'] ?? null);
+        $value = $default ?? self::DEFAULTS[$key]['value'] ?? null;
         self::$cache[$key] = $value;
         return $value;
     }
 
     public static function set(string $key, mixed $value): void
     {
-        $db  = Database::getInstance();
+        $db = Database::getInstance();
         $existing = $db->fetchOne(
             "SELECT id FROM settings WHERE key_name = ?",
             [$key]
         );
 
+        $groupName = self::DEFAULTS[$key]['group'] ?? 'general';
+
         if ($existing) {
-            $db->update('settings', ['value' => (string)$value, 'updated_at' => date('Y-m-d H:i:s')], ['key_name' => $key]);
+            $db->update('settings', [
+                'value'      => (string)$value,
+                'group_name' => $groupName,
+                'updated_at' => date('Y-m-d H:i:s'),
+            ], ['key_name' => $key]);
         } else {
             $db->insert('settings', [
                 'key_name'   => $key,
                 'value'      => (string)$value,
-                'created_at' => date('Y-m-d H:i:s'),
+                'group_name' => $groupName,
                 'updated_at' => date('Y-m-d H:i:s'),
             ]);
         }

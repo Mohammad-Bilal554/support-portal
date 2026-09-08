@@ -1,4 +1,4 @@
-<?php $appName = env('APP_NAME', 'Support Portal'); ?>
+<?php $appName = setting('app_name', env('APP_NAME', 'Support Portal')); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

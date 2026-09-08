@@ -134,11 +134,12 @@ class TicketService
             $updateData['closed_at'] = date('Y-m-d H:i:s');
         }
 
-        Ticket::updateById($ticketId, $updateData);
-
-        $this->logStatusHistory($ticketId, $userId, $oldStatus, $newStatus, $note);
-        $this->logActivity($userId, 'status_changed', 'ticket', $ticketId,
-            "Status changed: {$oldStatus} → {$newStatus}");
+        $this->db->transaction(function() use ($ticketId, $updateData, $userId, $oldStatus, $newStatus, $note) {
+            Ticket::updateById($ticketId, $updateData);
+            $this->logStatusHistory($ticketId, $userId, $oldStatus, $newStatus, $note);
+            $this->logActivity($userId, 'status_changed', 'ticket', $ticketId,
+                "Status changed: {$oldStatus} → {$newStatus}");
+        });
 
         // Email notifications
         try {

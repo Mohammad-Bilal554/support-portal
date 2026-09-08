@@ -264,3 +264,9 @@ if (!function_exists('initials_avatar')) {
         return "<img src=\"{$url}\" width=\"{$size}\" height=\"{$size}\" style=\"border-radius:50%;object-fit:cover;\" alt=\"{$initials}\">";
     }
 }
+
+if (!function_exists('setting')) {
+    function setting(string $key, mixed $default = null): mixed {
+        return \App\Models\Setting::get($key, $default);
+    }
+}

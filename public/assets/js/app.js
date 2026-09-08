@@ -99,6 +99,14 @@ const SupportPortal = {
       const message = el.dataset.confirm || "Are you sure?";
 
       SupportPortal.confirm(message, () => {
+        // data-action with hidden form for DELETE/POST
+        const action = el.dataset.action;
+        const method = el.dataset.method ?? "POST";
+        if (action) {
+          SupportPortal.submitForm(action, method, { id: el.dataset.id });
+          return;
+        }
+
         // If it's a form submit button
         const form = el.closest("form");
         if (form) {
@@ -110,13 +118,6 @@ const SupportPortal = {
         const href = el.getAttribute("href");
         if (href) {
           window.location.href = href;
-        }
-
-        // data-action with hidden form for DELETE
-        const action = el.dataset.action;
-        const method = el.dataset.method ?? "POST";
-        if (action) {
-          SupportPortal.submitForm(action, method, { id: el.dataset.id });
         }
       });
     });

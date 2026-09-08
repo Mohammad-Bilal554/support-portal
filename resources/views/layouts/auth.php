@@ -1,5 +1,5 @@
 <?php
-$appName    = env('APP_NAME', 'Support Portal');
+$appName    = setting('app_name', env('APP_NAME', 'Support Portal'));
 $appUrl     = env('APP_URL', '');
 $pageTitle  = ($title ?? 'Auth') . ' – ' . $appName;
 $session    = \App\Core\Session::getInstance();

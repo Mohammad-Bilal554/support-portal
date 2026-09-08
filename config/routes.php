@@ -16,8 +16,10 @@ $router->group(['prefix' => 'auth'], function (Router $r) {
     $r->post('reset-password/{token}', [\App\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('auth.reset.post');
 });
 
-// ── Dashboard (authenticated) ─────────────────────────────────────────────
+// ── Dashboard & Profile (authenticated) ───────────────────────────────────
 $router->get('dashboard', [\App\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard')->middleware(['auth']);
+$router->get('profile',   [\App\Controllers\ProfileController::class, 'show'])->name('profile')->middleware(['auth']);
+$router->post('profile',  [\App\Controllers\ProfileController::class, 'update'])->name('profile.update')->middleware(['auth']);
 
 // ── Admin (authenticated + admin/employee role) ────────────────────────────
 $router->group(['prefix' => 'admin', 'middleware' => ['auth', 'role:super_admin,employee']], function (Router $r) {

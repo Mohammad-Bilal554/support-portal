@@ -125,8 +125,9 @@ class UserController extends Controller
         $this->requireLogin();
         $this->authorize($this->isAdmin());
 
-        $data      = $request->all();
-        $userId    = (int)$id;
+        $data              = $request->all();
+        $data['is_active'] = (isset($data['is_active']) && (string)$data['is_active'] === '1') ? 1 : 0;
+        $userId            = (int)$id;
         $validator = new Validator($data, [
             'first_name' => 'required|min_length:2|max_length:80',
             'last_name'  => 'required|min_length:2|max_length:80',

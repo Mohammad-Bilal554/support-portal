@@ -88,9 +88,10 @@ class Database {
         catch(\Throwable $e) { $this->rollBack(); throw $e; }
     }
     public function paginate(string $sql, array $params=[], int $page=1, int $perPage=15): array {
-        $total  = (int)$this->fetchColumn('SELECT COUNT(*) FROM ('.$sql.') AS _c',$params);
-        $offset = ($page-1)*$perPage;
-        $data   = $this->fetchAll($sql." LIMIT {$perPage} OFFSET {$offset}",$params);
+        $countSql = preg_replace('/ORDER\s+BY\s+[a-zA-Z0-9_\.,\s`\(\)\-]+$/i', '', $sql);
+        $total    = (int)$this->fetchColumn('SELECT COUNT(*) FROM ('.$countSql.') AS _c',$params);
+        $offset   = ($page-1)*$perPage;
+        $data     = $this->fetchAll($sql." LIMIT {$perPage} OFFSET {$offset}",$params);
         return ['data'=>$data,'total'=>$total,'per_page'=>$perPage,'current_page'=>$page,
                 'last_page'=>(int)ceil($total/$perPage),'from'=>$total>0?$offset+1:0,'to'=>min($offset+$perPage,$total)];
     }

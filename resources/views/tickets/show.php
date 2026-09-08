@@ -4,12 +4,27 @@ use App\Core\Csrf;
 use App\Models\User;
 use App\Models\Ticket;
 
-$session   = Session::getInstance();
-$csrfToken = Csrf::getToken();
-$user      = $authUser;
-$t         = $ticket;
-$isStaff   = in_array($user['role'], ['super_admin', 'employee']);
-$title     = $t['ticket_number'];
+/** @var array $authUser */
+/** @var array $ticket */
+/** @var array $employees */
+/** @var array $conversations */
+/** @var array $attachments */
+/** @var array $statusHistory */
+/** @var array $categories */
+/** @var array $transitions */
+
+$session       = Session::getInstance();
+$csrfToken     = Csrf::getToken();
+$user          = $authUser ?? [];
+$t             = $ticket ?? [];
+$employees     = $employees ?? [];
+$conversations = $conversations ?? [];
+$attachments   = $attachments ?? [];
+$statusHistory = $statusHistory ?? [];
+$categories    = $categories ?? [];
+$transitions   = $transitions ?? [];
+$isStaff       = in_array($user['role'] ?? '', ['super_admin', 'employee']);
+$title         = $t['ticket_number'] ?? 'Ticket';
 ob_start();
 ?>
 
@@ -467,35 +482,47 @@ function setReplyType(internal) {
 
 // ── Status change ─────────────────────────────────────────────────
 let pendingStatus = null;
-const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+
+function getStatusModal() {
+    const modalEl = document.getElementById('statusModal');
+    if (!modalEl || typeof bootstrap === 'undefined') return null;
+    return bootstrap.Modal.getOrCreateInstance(modalEl);
+}
 
 function changeStatus(status) {
     pendingStatus = status;
     const labels = <?= json_encode(Ticket::STATUSES) ?>;
     document.getElementById('statusLabel').textContent = labels[status] || status;
     document.getElementById('statusNote').value = '';
-    statusModal.show();
+    const modal = getStatusModal();
+    if (modal) modal.show();
 }
 
-document.getElementById('confirmStatusBtn').addEventListener('click', async () => {
-    if (!pendingStatus) return;
-    const note = document.getElementById('statusNote').value;
-    statusModal.hide();
-    try {
-        const res  = await fetch(`<?= url('tickets/' . $t['id'] . '/status') ?>`, {
-            method: 'POST',
-            headers: { 'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest','X-CSRF-Token':CSRF_TOKEN },
-            body: JSON.stringify({ status: pendingStatus, note }),
+document.addEventListener('DOMContentLoaded', () => {
+    const confirmBtn = document.getElementById('confirmStatusBtn');
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', async () => {
+            if (!pendingStatus) return;
+            const note = document.getElementById('statusNote').value;
+            const modal = getStatusModal();
+            if (modal) modal.hide();
+            try {
+                const res  = await fetch(`<?= url('tickets/' . $t['id'] . '/status') ?>`, {
+                    method: 'POST',
+                    headers: { 'Content-Type':'application/json','X-Requested-With':'XMLHttpRequest','X-CSRF-Token':CSRF_TOKEN },
+                    body: JSON.stringify({ status: pendingStatus, note }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    SupportPortal.showToast(data.message, 'success');
+                    location.reload();
+                } else {
+                    SupportPortal.showToast(data.message, 'danger');
+                }
+            } catch(err) {
+                SupportPortal.showToast('Network error.', 'danger');
+            }
         });
-        const data = await res.json();
-        if (data.success) {
-            SupportPortal.showToast(data.message, 'success');
-            setTimeout(() => location.reload(), 900);
-        } else {
-            SupportPortal.showToast(data.message, 'danger');
-        }
-    } catch(err) {
-        SupportPortal.showToast('Network error.', 'danger');
     }
 });
 

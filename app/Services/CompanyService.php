@@ -210,7 +210,7 @@ class CompanyService
 
     // ── Activity log ──────────────────────────────────────────────
 
-    private function logActivity(int $userId, string $action, string $entityType, int $entityId, string $desc): void
+    private function logActivity(?int $userId, string $action, string $entityType, int $entityId, string $desc): void
     {
         try {
             $this->db->insert('activity_logs', [

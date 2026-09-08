@@ -130,7 +130,7 @@ class User extends Model
 
     public static function emailExists(string $email, int $excludeId = 0): bool
     {
-        $sql    = "SELECT COUNT(*) FROM users WHERE email = ? AND id != ?";
+        $sql    = "SELECT COUNT(*) FROM users WHERE email = ? AND id != ? AND is_active = 1";
         return (int)static::db()->fetchColumn($sql, [$email, $excludeId]) > 0;
     }
 

@@ -21,8 +21,16 @@ class UserService
 
     public function create(array $data, ?array $avatarFile = null): array
     {
-        // Check email uniqueness
-        if (User::emailExists($data['email'])) {
+        $email = strtolower(trim($data['email']));
+
+        // Free up email if an inactive account previously used it
+        $inactive = User::findBy(['email' => $email, 'is_active' => 0]);
+        if ($inactive) {
+            User::updateById((int)$inactive['id'], ['email' => $email . '.deleted.' . time()]);
+        }
+
+        // Check active email uniqueness
+        if (User::emailExists($email)) {
             return ['success' => false, 'message' => 'Email address is already taken.'];
         }
 
@@ -46,10 +54,10 @@ class UserService
             }
         }
 
-        $id = User::create($insertData);
+        $id = (int)User::create($insertData);
 
         $this->logActivity(
-            auth_id() ?? $id,
+            (int)(auth_id() ?? $id),
             'user_created', 'user', $id,
             "User created: {$insertData['email']} (role: {$insertData['role']})"
         );
@@ -129,13 +137,10 @@ class UserService
             return ['success' => false, 'message' => 'You cannot delete your own account.'];
         }
 
-        // Delete avatar file if exists
-        if (!empty($user['avatar'])) {
-            $this->deleteAvatar($user['avatar']);
-        }
-
-        // Soft delete: just deactivate (keeps ticket history intact)
-        User::updateById($id, ['is_active' => 0]);
+        // Deactivate user account (preserve user record in database)
+        User::updateById($id, [
+            'is_active' => 0,
+        ]);
 
         $this->logActivity(
             auth_id(),
@@ -225,7 +230,7 @@ class UserService
 
     // ── Activity log ──────────────────────────────────────────────
 
-    private function logActivity(int $userId, string $action, string $entityType, int $entityId, string $desc): void
+    private function logActivity(?int $userId, string $action, string $entityType, int $entityId, string $desc): void
     {
         try {
             $this->db->insert('activity_logs', [

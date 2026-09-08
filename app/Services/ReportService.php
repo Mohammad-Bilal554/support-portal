@@ -20,13 +20,21 @@ class ReportService
     {
         [$from, $to] = $this->getDateRange($filters);
         $p    = [$from, $to];
-        $base = "FROM tickets WHERE created_at BETWEEN ? AND ?";
+        $row  = $this->db->fetchOne(
+            "SELECT COUNT(*) as total_tickets,
+                    SUM(CASE WHEN status='open' THEN 1 ELSE 0 END) as open_tickets,
+                    SUM(CASE WHEN status IN ('resolved','closed') THEN 1 ELSE 0 END) as resolved_tickets,
+                    SUM(CASE WHEN priority='critical' THEN 1 ELSE 0 END) as critical_tickets
+             FROM tickets WHERE created_at BETWEEN ? AND ?",
+            $p
+        ) ?? [];
+
         return [
-            'total_tickets'    => (int)$this->db->fetchColumn("SELECT COUNT(*) {$base}", $p),
-            'open_tickets'     => (int)$this->db->fetchColumn("SELECT COUNT(*) {$base} AND status='open'", $p),
-            'resolved_tickets' => (int)$this->db->fetchColumn("SELECT COUNT(*) {$base} AND status IN ('resolved','closed')", $p),
+            'total_tickets'    => (int)($row['total_tickets'] ?? 0),
+            'open_tickets'     => (int)($row['open_tickets'] ?? 0),
+            'resolved_tickets' => (int)($row['resolved_tickets'] ?? 0),
             'avg_resolution_h' => $this->getAvgResolutionHours($from, $to),
-            'critical_tickets' => (int)$this->db->fetchColumn("SELECT COUNT(*) {$base} AND priority='critical'", $p),
+            'critical_tickets' => (int)($row['critical_tickets'] ?? 0),
             'date_from'        => $from,
             'date_to'          => $to,
         ];

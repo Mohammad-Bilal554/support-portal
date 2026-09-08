@@ -15,7 +15,7 @@ use App\Core\Csrf;
 use App\Models\User;
 
 $session  = Session::getInstance();
-$appName  = env('APP_NAME', 'Support Portal');
+$appName  = setting('app_name', env('APP_NAME', 'Support Portal'));
 $appUrl   = env('APP_URL', '');
 $user     = $authUser ?? $session->getUser() ?? [];
 $role     = $user['role'] ?? 'client';
@@ -117,17 +117,19 @@ function canSee(array $item, string $role): bool {
                 <span class="nav-label"><?= htmlspecialchars($item['label']) ?></span>
                 <?php if ($item['label'] === 'Tickets'): ?>
                     <?php
-                    // Unread ticket count badge
                     try {
-                        $db = \App\Core\Database::getInstance();
-                        if ($role === 'client') {
-                            $cnt = $db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE created_by=? AND status NOT IN ('closed','resolved')", [$user['id']]);
-                        } else {
-                            $cnt = $db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE status='open'");
+                        static $sidebarTicketCount = null;
+                        if ($sidebarTicketCount === null && !empty($user['id'])) {
+                            $db = \App\Core\Database::getInstance();
+                            if ($role === 'client') {
+                                $sidebarTicketCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE created_by=? AND status NOT IN ('closed','resolved')", [$user['id']]);
+                            } else {
+                                $sidebarTicketCount = (int)$db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE status='open'");
+                            }
                         }
-                        if ($cnt > 0):
+                        if (($sidebarTicketCount ?? 0) > 0):
                     ?>
-                    <span class="badge bg-danger nav-badge"><?= $cnt > 99 ? '99+' : $cnt ?></span>
+                    <span class="badge bg-danger nav-badge"><?= $sidebarTicketCount > 99 ? '99+' : $sidebarTicketCount ?></span>
                     <?php endif; } catch(\Throwable $e) {} ?>
                 <?php endif; ?>
             </a>
@@ -271,7 +273,7 @@ function canSee(array $item, string $role): bool {
                             </div>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-person-circle"></i> My Profile</a></li>
+                        <li><a class="dropdown-item" href="<?= url('profile') ?>"><i class="bi bi-person-circle"></i> My Profile</a></li>
                         <li><a class="dropdown-item" href="<?= url('tickets') ?>"><i class="bi bi-ticket-perforated"></i> My Tickets</a></li>
                         <?php if ($role === 'super_admin'): ?>
                         <li><a class="dropdown-item" href="<?= url('admin/settings') ?>"><i class="bi bi-gear"></i> Settings</a></li>

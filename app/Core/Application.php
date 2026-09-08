@@ -80,6 +80,7 @@ class Application {
             session_name(env('SESSION_NAME','support_portal_session'));
             session_set_cookie_params(['lifetime'=>(int)env('SESSION_LIFETIME',120)*60,'path'=>'/','httponly'=>true,'samesite'=>'Lax']);
             session_start();
+            session_write_close();
         }
     }
     private function registerCoreBindings(): void {

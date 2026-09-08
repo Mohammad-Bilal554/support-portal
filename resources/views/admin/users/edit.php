@@ -157,6 +157,7 @@ ob_start();
                         <!-- Status -->
                         <div class="col-md-6">
                             <div class="form-check form-switch mt-1">
+                                <input type="hidden" name="is_active" value="0">
                                 <input class="form-check-input" type="checkbox"
                                        name="is_active" id="isActive" value="1"
                                        <?= ($old['is_active'] ?? $u['is_active']) ? 'checked' : '' ?>
@@ -231,25 +232,41 @@ ob_start();
                 </div>
             </div>
 
-            <!-- Danger Zone -->
+            <!-- Danger Zone / Account Status -->
             <?php if ((int)$u['id'] !== auth_id()): ?>
-            <div class="card border-danger" style="border-color:#dc3545 !important;">
-                <div class="card-header" style="background:#fef2f2;color:#991b1b;">
-                    <span><i class="bi bi-exclamation-triangle-fill me-2"></i>Danger Zone</span>
+                <?php if ($u['is_active']): ?>
+                <div class="card border-danger" style="border-color:#dc3545 !important;">
+                    <div class="card-header" style="background:#fef2f2;color:#991b1b;">
+                        <span><i class="bi bi-exclamation-triangle-fill me-2"></i>Danger Zone</span>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size:.825rem;color:var(--text-secondary);margin-bottom:1rem;">
+                            Deactivating this user will prevent them from logging in. All their tickets and data will be preserved.
+                        </p>
+                        <button type="button"
+                                class="btn btn-outline-danger btn-sm w-100"
+                                onclick="confirmDeactivate(<?= $u['id'] ?>, '<?= htmlspecialchars(User::fullName($u), ENT_QUOTES) ?>', this)">
+                            <i class="bi bi-person-x-fill me-1"></i>Deactivate User
+                        </button>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p style="font-size:.825rem;color:var(--text-secondary);margin-bottom:1rem;">
-                        Deactivating this user will prevent them from logging in. All their tickets and data will be preserved.
-                    </p>
-                    <button type="button"
-                            class="btn btn-outline-danger btn-sm w-100"
-                            data-confirm="Deactivate user '<?= htmlspecialchars(User::fullName($u)) ?>'? They will lose access immediately."
-                            data-action="<?= url('admin/users/' . $u['id']) ?>"
-                            data-method="DELETE">
-                        <i class="bi bi-person-x-fill me-1"></i>Deactivate User
-                    </button>
+                <?php else: ?>
+                <div class="card border-success" style="border-color:#198754 !important;">
+                    <div class="card-header" style="background:#f0fdf4;color:#166534;">
+                        <span><i class="bi bi-person-check-fill me-2"></i>Account Inactive</span>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size:.825rem;color:var(--text-secondary);margin-bottom:1rem;">
+                            This user account is currently deactivated. Activating will restore their ability to log in.
+                        </p>
+                        <button type="button"
+                                class="btn btn-outline-success btn-sm w-100"
+                                onclick="toggleUserStatus(<?= $u['id'] ?>, this)">
+                            <i class="bi bi-person-check-fill me-1"></i>Activate User
+                        </button>
+                    </div>
                 </div>
-            </div>
+                <?php endif; ?>
             <?php endif; ?>
 
         </div>
@@ -286,6 +303,45 @@ document.querySelector('.btn-password-toggle')?.addEventListener('click', functi
     input.type  = input.type === 'password' ? 'text' : 'password';
     icon.className = input.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
 });
+
+function confirmDeactivate(userId, userName, btn) {
+    SupportPortal.confirm(`Deactivate user '${userName}'? They will lose access immediately.`, () => {
+        toggleUserStatus(userId, btn);
+    });
+}
+
+// Toggle status AJAX helper
+function toggleUserStatus(userId, btn) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+    fetch(`<?= url('admin/users') ?>/${userId}/toggle`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-Token': csrfToken,
+        },
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            SupportPortal.showToast(data.message, 'success');
+            setTimeout(() => window.location.reload(), 800);
+        } else {
+            SupportPortal.showToast(data.message, 'danger');
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    })
+    .catch(() => {
+        SupportPortal.showToast('Something went wrong.', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+    });
+}
 </script>
 
 <?php

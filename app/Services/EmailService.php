@@ -299,6 +299,7 @@ class EmailService
                 'tls'   => \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS,
                 default => '',
             };
+            $mail->Timeout    = 3;
         } elseif ($driver === 'sendmail') {
             $mail->isSendmail();
         } else {

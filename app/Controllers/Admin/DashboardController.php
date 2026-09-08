@@ -59,71 +59,58 @@ class DashboardController extends Controller
         ]);
     }
 
-    // GET /admin/logs
-    public function logs(Request $request): string
-    {
-        $this->requireLogin();
-        $this->authorize($this->isAdmin());
-
-        $page = max(1, (int)($request->query('page', 1)));
-        $logs = $this->db->paginate(
-            "SELECT l.*, u.first_name, u.last_name, u.email
-             FROM activity_logs l
-             LEFT JOIN users u ON u.id = l.user_id
-             ORDER BY l.created_at DESC",
-            [], $page, 30
-        );
-
-        return $this->view('admin.logs', [
-            'title'      => 'Activity Logs',
-            'logs'       => $logs,
-            'breadcrumbs'=> [['label'=>'System'],['label'=>'Activity Logs']],
-        ]);
-    }
-
     // ── Private helpers ──────────────────────────────────────────
 
     private function getStatCards(string $role, int $userId, ?int $companyId): array
     {
         try {
             if ($role === 'client') {
-                $cond   = "WHERE created_by = {$userId}";
-                $total  = $this->db->fetchColumn("SELECT COUNT(*) FROM tickets {$cond}");
-                $open   = $this->db->fetchColumn("SELECT COUNT(*) FROM tickets {$cond} AND status='open'");
-                $prog   = $this->db->fetchColumn("SELECT COUNT(*) FROM tickets {$cond} AND status='in_progress'");
-                $res    = $this->db->fetchColumn("SELECT COUNT(*) FROM tickets {$cond} AND status='resolved'");
+                $row = $this->db->fetchOne(
+                    "SELECT COUNT(*) as total,
+                            SUM(CASE WHEN status='open' THEN 1 ELSE 0 END) as open_cnt,
+                            SUM(CASE WHEN status='in_progress' THEN 1 ELSE 0 END) as prog_cnt,
+                            SUM(CASE WHEN status='resolved' THEN 1 ELSE 0 END) as res_cnt
+                     FROM tickets WHERE created_by = ?",
+                    [$userId]
+                ) ?? [];
                 return [
-                    ['label'=>'My Tickets',    'value'=>$total, 'icon'=>'bi-ticket-perforated-fill','color'=>'bg-primary bg-opacity-10 text-primary'],
-                    ['label'=>'Open',           'value'=>$open,  'icon'=>'bi-folder2-open',           'color'=>'bg-danger bg-opacity-10 text-danger'],
-                    ['label'=>'In Progress',    'value'=>$prog,  'icon'=>'bi-hourglass-split',        'color'=>'bg-warning bg-opacity-10 text-warning'],
-                    ['label'=>'Resolved',       'value'=>$res,   'icon'=>'bi-check-circle-fill',      'color'=>'bg-success bg-opacity-10 text-success'],
+                    ['label'=>'My Tickets', 'value'=>(int)($row['total']??0),    'icon'=>'bi-ticket-perforated-fill','color'=>'bg-primary bg-opacity-10 text-primary'],
+                    ['label'=>'Open',       'value'=>(int)($row['open_cnt']??0), 'icon'=>'bi-folder2-open',           'color'=>'bg-danger bg-opacity-10 text-danger'],
+                    ['label'=>'In Progress','value'=>(int)($row['prog_cnt']??0), 'icon'=>'bi-hourglass-split',        'color'=>'bg-warning bg-opacity-10 text-warning'],
+                    ['label'=>'Resolved',   'value'=>(int)($row['res_cnt']??0),  'icon'=>'bi-check-circle-fill',      'color'=>'bg-success bg-opacity-10 text-success'],
                 ];
             }
 
             if ($role === 'employee') {
-                $total  = $this->db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE assigned_to = {$userId}");
-                $open   = $this->db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE assigned_to = {$userId} AND status IN ('assigned','in_progress')");
-                $res    = $this->db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE assigned_to = {$userId} AND status='resolved'");
-                $unass  = $this->db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE status='open'");
+                $row = $this->db->fetchOne(
+                    "SELECT SUM(CASE WHEN assigned_to = ? THEN 1 ELSE 0 END) as total,
+                            SUM(CASE WHEN assigned_to = ? AND status IN ('assigned','in_progress') THEN 1 ELSE 0 END) as open_cnt,
+                            SUM(CASE WHEN assigned_to = ? AND status='resolved' THEN 1 ELSE 0 END) as res_cnt,
+                            SUM(CASE WHEN status='open' THEN 1 ELSE 0 END) as unass_cnt
+                     FROM tickets",
+                    [$userId, $userId, $userId]
+                ) ?? [];
                 return [
-                    ['label'=>'Assigned to Me', 'value'=>$total, 'icon'=>'bi-person-check-fill',      'color'=>'bg-primary bg-opacity-10 text-primary'],
-                    ['label'=>'Active',          'value'=>$open,  'icon'=>'bi-hourglass-split',        'color'=>'bg-warning bg-opacity-10 text-warning'],
-                    ['label'=>'Resolved by Me',  'value'=>$res,   'icon'=>'bi-check-circle-fill',      'color'=>'bg-success bg-opacity-10 text-success'],
-                    ['label'=>'Unassigned',      'value'=>$unass, 'icon'=>'bi-inbox-fill',             'color'=>'bg-danger bg-opacity-10 text-danger'],
+                    ['label'=>'Assigned to Me', 'value'=>(int)($row['total']??0),    'icon'=>'bi-person-check-fill', 'color'=>'bg-primary bg-opacity-10 text-primary'],
+                    ['label'=>'Active',         'value'=>(int)($row['open_cnt']??0), 'icon'=>'bi-hourglass-split',   'color'=>'bg-warning bg-opacity-10 text-warning'],
+                    ['label'=>'Resolved by Me', 'value'=>(int)($row['res_cnt']??0),  'icon'=>'bi-check-circle-fill', 'color'=>'bg-success bg-opacity-10 text-success'],
+                    ['label'=>'Unassigned',     'value'=>(int)($row['unass_cnt']??0),'icon'=>'bi-inbox-fill',        'color'=>'bg-danger bg-opacity-10 text-danger'],
                 ];
             }
 
             // super_admin
-            $total  = $this->db->fetchColumn("SELECT COUNT(*) FROM tickets");
-            $open   = $this->db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE status='open'");
-            $prog   = $this->db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE status='in_progress'");
-            $res    = $this->db->fetchColumn("SELECT COUNT(*) FROM tickets WHERE status='resolved' AND DATE(resolved_at)=CURDATE()");
-            $users  = $this->db->fetchColumn("SELECT COUNT(*) FROM users WHERE is_active=1");
+            $row = $this->db->fetchOne(
+                "SELECT COUNT(*) as total,
+                        SUM(CASE WHEN status='open' THEN 1 ELSE 0 END) as open_cnt,
+                        SUM(CASE WHEN status='in_progress' THEN 1 ELSE 0 END) as prog_cnt,
+                        SUM(CASE WHEN status='resolved' AND DATE(resolved_at)=CURDATE() THEN 1 ELSE 0 END) as res_cnt
+                 FROM tickets"
+            ) ?? [];
             return [
-                ['label'=>'Total Tickets',   'value'=>$total, 'icon'=>'bi-ticket-perforated-fill','color'=>'bg-primary bg-opacity-10 text-primary'],
-                ['label'=>'Open',            'value'=>$open,  'icon'=>'bi-folder2-open',           'color'=>'bg-danger bg-opacity-10 text-danger'],
-                ['label'=>'In Progress',     'value'=>$prog,  'icon'=>'bi-hourglass-split',        'color'=>'bg-warning bg-opacity-10 text-warning'],
-                ['label'=>'Resolved Today',  'value'=>$res,   'icon'=>'bi-check-circle-fill',      'color'=>'bg-success bg-opacity-10 text-success'],
+                ['label'=>'Total Tickets',  'value'=>(int)($row['total']??0),    'icon'=>'bi-ticket-perforated-fill','color'=>'bg-primary bg-opacity-10 text-primary'],
+                ['label'=>'Open',           'value'=>(int)($row['open_cnt']??0), 'icon'=>'bi-folder2-open',           'color'=>'bg-danger bg-opacity-10 text-danger'],
+                ['label'=>'In Progress',    'value'=>(int)($row['prog_cnt']??0), 'icon'=>'bi-hourglass-split',        'color'=>'bg-warning bg-opacity-10 text-warning'],
+                ['label'=>'Resolved Today', 'value'=>(int)($row['res_cnt']??0),  'icon'=>'bi-check-circle-fill',      'color'=>'bg-success bg-opacity-10 text-success'],
             ];
 
         } catch (\Throwable $e) {
@@ -176,19 +163,43 @@ class DashboardController extends Controller
         $resData  = [];
 
         try {
+            $days = [];
             for ($i = 6; $i >= 0; $i--) {
-                $date     = date('Y-m-d', strtotime("-{$i} days"));
-                $labels[] = date('D d', strtotime($date));
-
-                $cond = $role === 'employee' ? " AND assigned_to = {$userId}" : '';
-
-                $newData[] = (int)$this->db->fetchColumn(
-                    "SELECT COUNT(*) FROM tickets WHERE DATE(created_at)=?{$cond}", [$date]
-                );
-                $resData[] = (int)$this->db->fetchColumn(
-                    "SELECT COUNT(*) FROM tickets WHERE DATE(resolved_at)=? AND status IN ('resolved','closed'){$cond}", [$date]
-                );
+                $d = date('Y-m-d', strtotime("-{$i} days"));
+                $days[$d] = date('D d', strtotime($d));
             }
+
+            $labels = array_values($days);
+            $newMap = array_fill_keys(array_keys($days), 0);
+            $resMap = array_fill_keys(array_keys($days), 0);
+
+            $startDate = date('Y-m-d 00:00:00', strtotime('-6 days'));
+            $condParams = [];
+            $condSql = '';
+            if ($role === 'employee') {
+                $condSql = ' AND assigned_to = ?';
+                $condParams[] = $userId;
+            }
+
+            $newRows = $this->db->fetchAll(
+                "SELECT DATE(created_at) as dt, COUNT(*) as cnt FROM tickets WHERE created_at >= ?{$condSql} GROUP BY DATE(created_at)",
+                array_merge([$startDate], $condParams)
+            );
+            foreach ($newRows as $r) {
+                if (isset($newMap[$r['dt']])) $newMap[$r['dt']] = (int)$r['cnt'];
+            }
+
+            $resRows = $this->db->fetchAll(
+                "SELECT DATE(resolved_at) as dt, COUNT(*) as cnt FROM tickets WHERE resolved_at >= ? AND status IN ('resolved','closed'){$condSql} GROUP BY DATE(resolved_at)",
+                array_merge([$startDate], $condParams)
+            );
+            foreach ($resRows as $r) {
+                if (isset($resMap[$r['dt']])) $resMap[$r['dt']] = (int)$r['cnt'];
+            }
+
+            $newData = array_values($newMap);
+            $resData = array_values($resMap);
+
         } catch (\Throwable) {
             $labels  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
             $newData = $resData = array_fill(0, 7, 0);
