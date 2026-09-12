@@ -115,7 +115,7 @@ ob_start();
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Role <span class="text-danger">*</span></label>
-                            <select name="role" class="form-select <?= isset($errors['role']) ? 'is-invalid' : '' ?>" required>
+                            <select name="role" id="roleSelect" class="form-select <?= isset($errors['role']) ? 'is-invalid' : '' ?>" required>
                                 <option value="super_admin" <?= ($old['role'] ?? $u['role']) === 'super_admin' ? 'selected' : '' ?>>Super Admin</option>
                                 <option value="employee"    <?= ($old['role'] ?? $u['role']) === 'employee'    ? 'selected' : '' ?>>Employee</option>
                                 <option value="client"      <?= ($old['role'] ?? $u['role']) === 'client'      ? 'selected' : '' ?>>Client</option>
@@ -124,10 +124,10 @@ ob_start();
                                 <div class="invalid-feedback"><?= htmlspecialchars($errors['role'][0]) ?></div>
                             <?php endif; ?>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6" id="companyField">
                             <label class="form-label">Company</label>
-                            <select name="company_id" class="form-select">
-                                <option value="">No Company</option>
+                            <select name="company_id" id="companySelect" class="form-select">
+                                <option value="">No Company / Support Portal</option>
                                 <?php foreach ($companies as $c): ?>
                                 <option value="<?= $c['id'] ?>"
                                     <?= ($old['company_id'] ?? $u['company_id']) == $c['id'] ? 'selected' : '' ?>>
@@ -298,6 +298,28 @@ document.getElementById('avatarFile').addEventListener('change', function() {
     reader.onload = e => document.getElementById('avatarPreview').src = e.target.result;
     reader.readAsDataURL(file);
 });
+
+// Company field toggle based on role
+function toggleCompanyField() {
+    const roleSelect    = document.getElementById('roleSelect');
+    const companyField  = document.getElementById('companyField');
+    const companySelect = document.getElementById('companySelect');
+    if (!roleSelect || !companyField || !companySelect) return;
+
+    const role = roleSelect.value;
+    if (role === 'super_admin' || role === 'employee') {
+        companyField.style.display = 'none';
+        let portalOpt = Array.from(companySelect.options).find(opt => 
+            opt.text.trim().toLowerCase().includes('support portal')
+        );
+        companySelect.value = portalOpt ? portalOpt.value : '';
+    } else {
+        companyField.style.display = '';
+    }
+}
+
+document.getElementById('roleSelect')?.addEventListener('change', toggleCompanyField);
+toggleCompanyField();
 
 // Password toggle
 document.querySelector('.btn-password-toggle')?.addEventListener('click', function() {

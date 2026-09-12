@@ -124,8 +124,8 @@ ob_start();
                         </div>
                         <div class="col-md-6" id="companyField">
                             <label class="form-label">Company</label>
-                            <select name="company_id" class="form-select">
-                                <option value="">No Company</option>
+                            <select name="company_id" id="companySelect" class="form-select">
+                                <option value="">No Company / Support Portal</option>
                                 <?php foreach ($companies as $c): ?>
                                 <option value="<?= $c['id'] ?>" <?= ($old['company_id'] ?? '') == $c['id'] ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($c['name']) ?>
@@ -293,13 +293,29 @@ const roleInfo = {
     ],
 };
 
+function toggleCompanyField() {
+    const roleSelect    = document.getElementById('roleSelect');
+    const companyField  = document.getElementById('companyField');
+    const companySelect = document.getElementById('companySelect');
+    if (!roleSelect || !companyField || !companySelect) return;
+
+    const role = roleSelect.value;
+    if (role === 'super_admin' || role === 'employee') {
+        companyField.style.display = 'none';
+        let portalOpt = Array.from(companySelect.options).find(opt => 
+            opt.text.trim().toLowerCase().includes('support portal')
+        );
+        companySelect.value = portalOpt ? portalOpt.value : '';
+    } else {
+        companyField.style.display = '';
+    }
+}
+
 document.getElementById('roleSelect').addEventListener('change', function() {
     const role  = this.value;
     const body  = document.getElementById('roleInfoBody');
-    const comp  = document.getElementById('companyField');
 
-    // Show/hide company field
-    comp.style.opacity = (role === 'client') ? '1' : '0.5';
+    toggleCompanyField();
 
     if (!role || !roleInfo[role]) {
         body.innerHTML = '<div class="p-3 text-muted" style="font-size:.825rem;">Select a role to see permissions.</div>';
@@ -314,6 +330,9 @@ document.getElementById('roleSelect').addEventListener('change', function() {
     ).join('');
     body.innerHTML = items;
 });
+
+// Initial trigger on load
+toggleCompanyField();
 </script>
 
 <?php

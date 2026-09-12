@@ -34,14 +34,21 @@ class UserService
             return ['success' => false, 'message' => 'Email address is already taken.'];
         }
 
+        $role = $data['role'] ?? 'client';
+        $companyId = !empty($data['company_id']) ? (int)$data['company_id'] : null;
+        if ($role === 'super_admin' || $role === 'employee') {
+            $portalComp = Database::getInstance()->fetchOne("SELECT id FROM companies WHERE LOWER(name) LIKE '%support portal%' LIMIT 1");
+            $companyId = $portalComp ? (int)$portalComp['id'] : null;
+        }
+
         $insertData = [
             'first_name'     => trim($data['first_name']),
             'last_name'      => trim($data['last_name']),
             'email'          => strtolower(trim($data['email'])),
             'password'       => User::hashPassword($data['password']),
-            'role'           => $data['role'],
+            'role'           => $role,
             'phone'          => $data['phone'] ?? null,
-            'company_id'     => !empty($data['company_id']) ? (int)$data['company_id'] : null,
+            'company_id'     => $companyId,
             'is_active'      => isset($data['is_active']) ? (int)(bool)$data['is_active'] : 1,
             'email_verified' => 1,
         ];
@@ -81,15 +88,22 @@ class UserService
             return ['success' => false, 'message' => 'Email address is already taken.'];
         }
 
-        $updateData = array_filter([
-            'first_name' => !empty($data['first_name']) ? trim($data['first_name']) : null,
-            'last_name'  => !empty($data['last_name'])  ? trim($data['last_name'])  : null,
-            'email'      => !empty($data['email'])       ? strtolower(trim($data['email'])) : null,
-            'role'       => $data['role']       ?? null,
+        $role = $data['role'] ?? $user['role'] ?? 'client';
+        $companyId = !empty($data['company_id']) ? (int)$data['company_id'] : null;
+        if ($role === 'super_admin' || $role === 'employee') {
+            $portalComp = Database::getInstance()->fetchOne("SELECT id FROM companies WHERE LOWER(name) LIKE '%support portal%' LIMIT 1");
+            $companyId = $portalComp ? (int)$portalComp['id'] : null;
+        }
+
+        $updateData = [
+            'first_name' => !empty($data['first_name']) ? trim($data['first_name']) : $user['first_name'],
+            'last_name'  => !empty($data['last_name'])  ? trim($data['last_name'])  : $user['last_name'],
+            'email'      => !empty($data['email'])       ? strtolower(trim($data['email'])) : $user['email'],
+            'role'       => $role,
             'phone'      => $data['phone']      ?? null,
-            'company_id' => !empty($data['company_id']) ? (int)$data['company_id'] : null,
-            'is_active'  => isset($data['is_active']) ? (int)(bool)$data['is_active'] : null,
-        ], fn($v) => $v !== null);
+            'company_id' => $companyId,
+            'is_active'  => isset($data['is_active']) ? (int)(bool)$data['is_active'] : (int)$user['is_active'],
+        ];
 
         // Update password only if provided
         if (!empty($data['password'])) {

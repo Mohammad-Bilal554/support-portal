@@ -80,7 +80,8 @@ abstract class Model {
         foreach (static::$casts as $col=>$type) {
             if (!array_key_exists($col,$row)) continue;
             $row[$col] = match($type) {
-                'int','integer'=>(int)$row[$col],'float','double'=>(float)$row[$col],
+                'int','integer'=>$row[$col]===null?null:(int)$row[$col],
+                'float','double'=>$row[$col]===null?null:(float)$row[$col],
                 'bool','boolean'=>(bool)$row[$col],
                 'array','json'=>is_string($row[$col])?json_decode($row[$col],true):$row[$col],
                 default=>$row[$col],
